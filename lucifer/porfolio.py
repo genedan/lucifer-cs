@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pandas import DataFrame
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -24,3 +26,18 @@ class Portfolio:
     ) -> float:
 
         return sum([policy.earned_premium(as_of=as_of) for policy in self.policy_list])
+
+    @ property
+    def origin_years(self) -> list:
+
+        origin_years = list(set(policy.effective_date.year for policy in self.policy_list))
+        origin_years.sort()
+        return origin_years
+
+    @property
+    def df_long(self) -> DataFrame:
+
+        d = {
+            'Origin': [policy.effective_date.year for policy in self.policy_list]
+            'Development'
+        }
