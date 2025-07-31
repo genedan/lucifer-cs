@@ -3,6 +3,12 @@ from datetime import (
     timedelta
 )
 
+from lucifer.claim import Claim
+
+from pandas import DataFrame
+
+from scipy.stats import poisson
+
 class Policy:
     def __init__(
             self,
@@ -12,6 +18,8 @@ class Policy:
     ):
 
         self.effective_date = effective_date
+        self.claim_mean = (1 * .3) / 365
+        self.claim_list = []
 
         if expiration_date:
             self.expiration_date = expiration_date
@@ -43,3 +51,12 @@ class Policy:
             elapsed_prop = max((as_of - self.effective_date) / self.policy_length, 1)
 
         return elapsed_prop * self.written_premium
+
+    def simulate_claims(self, occurrence_date: date):
+
+        n_claims = poisson.rvs(mu=self.claim_mean)
+
+        if n_claims >= 1:
+
+            for i in range(n_claims):
+                self.claim_list += [Claim(occurrence_date=occurrence_date)]

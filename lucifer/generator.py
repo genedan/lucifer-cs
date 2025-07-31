@@ -9,7 +9,8 @@ from lucifer.porfolio import Portfolio
 from rich.progress import Progress
 
 from scipy.stats import poisson, uniform
-
+from rich.console import Console
+console=Console(force_interactive=True)
 from typing import TYPE_CHECKING
 
 def write_portfolio(
@@ -20,7 +21,7 @@ def write_portfolio(
 ) -> Portfolio:
 
     portfolio = Portfolio()
-    progress =  Progress()
+    progress =  Progress(console=console)
     progress.start()
     current_date: date = start_date
     n_days = (end_date-start_date).days
@@ -34,6 +35,9 @@ def write_portfolio(
         for i in range(n_policies_written):
             new_policy = Policy(effective_date=current_date, written_premium=uniform.rvs(loc=500, scale=premium_mean))
             portfolio.add_policy(new_policy)
+
+        for policy in portfolio.policy_list:
+            policy.simulate_claims(occurrence_date=current_date)
 
         progress.update(day_tracker, advance=1)
         current_date += datetime.timedelta(days=1)
